@@ -3,14 +3,13 @@ using System.Collections.Generic;
 
 public class DeckManager : MonoBehaviour
 {
-    public List<Card> deck = new List<Card>();
-
+    // public List<Card> deck = new List<Card>();
     private string[] suits = { "diamond", "spade", "heart", "club" };
     private string[] ranks = { "6", "7", "8", "9", "10", "J", "Q", "K" };
 
     [Header("Scene Setup")]
     public GameObject cardPrefab;   // Prefab with a SpriteRenderer
-    public Transform spawnParent;   // Just an empty GameObject to organize them
+    // public Transform spawnParent;   // Just an empty GameObject to organize them
 
 
     // You can adjust the values based on your game's rules
@@ -30,15 +29,17 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    void Awake()
-    {
-        CreateDeck();
-        SpawnCardsInScene();
+    // void Awake()
+    // {
+    //     CreateDeck();
+    //     ShuffleDeck();
+    //     SpawnCardsInScene();
 
-    }
+    // }
 
-    void CreateDeck()
+    public List<Card> CreateDeck()
     {
+        List<Card> deck = new List<Card>();
         deck.Clear();
         foreach (string suit in suits)
         {
@@ -66,9 +67,24 @@ public class DeckManager : MonoBehaviour
         }
 
         Debug.Log("Created deck with " + deck.Count + " cards.");
+        return deck;
     }
 
-    void SpawnCardsInScene()
+    public List<Card> ShuffleDeck(List<Card> deck)
+    {
+        // Fisher-Yates (Knuth) shuffle algorithm
+        for (int i = deck.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1); // Use Unity's Random
+            Card temp = deck[i];
+            deck[i] = deck[j];
+            deck[j] = temp;
+        }
+        Debug.Log("Deck shuffled.");
+        return deck;
+    }
+
+    public void SpawnCardsInScene(Transform spawnParent, List<Card> deck)
     {
         float startX = -5f; // starting X position
         float startY = 0f;  // Y position
@@ -78,13 +94,69 @@ public class DeckManager : MonoBehaviour
         foreach (Card card in deck)
         {
             GameObject go = Instantiate(cardPrefab, spawnParent);
-            go.transform.position = new Vector3(startX + (index * spacing), startY, 0f);
+            go.transform.position = new Vector3(startX + (index * spacing), startY * index, 0f);
 
             SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
             if (sr != null)
                 sr.sprite = card.sprite;
 
+            var ui = go.GetComponent<CardUI>();
+            ui.cardData = card;
+            ui.handIndex = deck.IndexOf(card);
+
+            if (go.GetComponent<Collider2D>() == null)
+            {
+                go.AddComponent<BoxCollider2D>();
+            }
+
             index++;
         }
+    }
+
+    public (List<List<Card>> dealtHands, List<Card> remainingDeck) DealCards(List<Player> players, List<Card> deck)
+    {
+        List<List<Card>> dealtHands = new List<List<Card>>();
+        for (int i = 0; i < players.Count; i++)
+        {
+            dealtHands.Add(new List<Card>());
+        }
+
+        // Assuming a 32-card deck and 2 players for now, adjust if needed
+        // int cardsPerPlayer = 5; // 3 + 2
+
+        // Deal 3 cards
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < players.Count; j++)
+            {
+                if (deck.Count > 0)
+                {
+                    dealtHands[j].Add(deck[0]);
+                    deck.RemoveAt(0);
+                }
+            }
+        }
+
+        // Deal 2 cards
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < players.Count; j++)
+            {
+                if (deck.Count > 0)
+                {
+                    dealtHands[j].Add(deck[0]);
+                    deck.RemoveAt(0);
+                }
+            }
+        }
+
+        // Assign the dealt hands to players
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].hands = dealtHands[i];
+        }
+
+        Debug.Log("Cards dealt.");
+        return (dealtHands, deck);
     }
 }

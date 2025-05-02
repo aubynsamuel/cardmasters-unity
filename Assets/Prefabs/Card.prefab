@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1217977937204623763}
   - component: {fileID: 4921896580540755316}
   - component: {fileID: 8149944113280340460}
+  - component: {fileID: 3748498245123524875}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -28,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.68, y: -3.67, z: -3.5120332}
-  m_LocalScale: {x: 0.19154625, y: 0.19154625, z: 0.19154625}
+  m_LocalScale: {x: 0.64393216, y: 0.64393216, z: 0.64393216}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -132,5 +133,23 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.0001, y: 0.0001}
+  m_Size: {x: 5.32, y: 7.48}
   m_EdgeRadius: 0
+--- !u!114 &3748498245123524875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5630392647009128151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 789ae743432ceff46962e9d4deddc249, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardData:
+    suit: 
+    rank: 
+    value: 0
+    sprite: {fileID: 0}
+  handIndex: 0

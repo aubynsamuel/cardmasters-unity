@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &897207439245540442
+--- !u!1 &5630392647009128151
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2805041307588147781}
-  - component: {fileID: 1143399749315224078}
-  - component: {fileID: 6630045047925308288}
-  - component: {fileID: 624997021257648243}
+  - component: {fileID: 1217977937204623763}
+  - component: {fileID: 4921896580540755316}
+  - component: {fileID: 8149944113280340460}
+  - component: {fileID: 8676578781133607321}
   m_Layer: 0
-  m_Name: Card 11
+  m_Name: NewCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2805041307588147781
+--- !u!4 &1217977937204623763
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 897207439245540442}
+  m_GameObject: {fileID: 5630392647009128151}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.626, y: -3.686, z: -3.3021336}
-  m_LocalScale: {x: 0.20485993, y: 0.20485993, z: 0.20485993}
+  m_LocalPosition: {x: -4.68, y: -3.67, z: -3.5120332}
+  m_LocalScale: {x: 0.19154625, y: 0.19154625, z: 0.19154625}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &1143399749315224078
+--- !u!212 &4921896580540755316
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 897207439245540442}
+  m_GameObject: {fileID: 5630392647009128151}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1192666240181191679, guid: e08795c38f27369479643564843e9064, type: 3}
+  m_Sprite: {fileID: 9051733669107541354, guid: aa2612519de0fd9418114039df3fd0b8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -89,13 +89,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &6630045047925308288
+--- !u!61 &8149944113280340460
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 897207439245540442}
+  m_GameObject: {fileID: 5630392647009128151}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -133,29 +133,17 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.0001, y: 0.0001}
+  m_Size: {x: 5.15, y: 7.31}
   m_EdgeRadius: 0
---- !u!114 &624997021257648243
+--- !u!114 &8676578781133607321
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 897207439245540442}
+  m_GameObject: {fileID: 5630392647009128151}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c409d2ed1cc55c5469adc7140e4dc534, type: 3}
+  m_Script: {fileID: 11500000, guid: b09a71714b9b1f14e980c41d5e353959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardData:
-    suit: 0
-    rank: 0
-    value: 0
-  cardBackground: {fileID: 0}
-  rankText: {fileID: 0}
-  suitSymbolCenter: {fileID: 0}
-  suitSymbolCorner: {fileID: 0}
-  diamondColor: {r: 1, g: 0, b: 0, a: 1}
-  spadeColor: {r: 0, g: 0, b: 0, a: 1}
-  heartColor: {r: 1, g: 0, b: 0, a: 1}
-  clubColor: {r: 0, g: 0, b: 0, a: 1}
