@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public static class CardAI
 {
@@ -44,6 +43,7 @@ public static class CardAI
 
                 if (winningCards.Count > 0)
                 {
+                    // Not sound will be removed in the future to make AI better
                     if (remainingRounds <= 2)
                     {
                         // Play highest winner in final rounds

@@ -100,9 +100,9 @@ public class DeckManager : MonoBehaviour
             if (sr != null)
                 sr.sprite = card.sprite;
 
-            var ui = go.GetComponent<CardUI>();
-            ui.cardData = card;
-            ui.handIndex = deck.IndexOf(card);
+            // var ui = go.GetComponent<CardUI>();
+            // ui.cardData = card;
+            // ui.handIndex = deck.IndexOf(card);
 
             if (go.GetComponent<Collider2D>() == null)
             {

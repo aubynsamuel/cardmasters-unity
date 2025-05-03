@@ -1,9 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using System.Collections;
-using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,29 +14,17 @@ public class GameManager : MonoBehaviour
     [Header("Player Setup")]
     public Player humanPlayer;
     public Player computerPlayer;
-    private readonly List<Player> players = new();
-
-    [Header("Dependencies")]
-    public DeckManager deckManager;
-    public Transform humanHandTransform;
-    public Transform computerHandTransform;
-    public Transform remainingDeckTransform;
-    // public GameObject cardPrefab;
-    public Transform playAreaTransform;
+    private List<Player> players = new();
 
     [Header("UI References")]
     public TMPro.TextMeshProUGUI messageText;
-    public GameObject startButton;
-    public TMPro.TextMeshProUGUI gameHistoryText;
 
     // Game state variables
-    private readonly List<Play> currentPlays = new();
+    private List<Play> currentPlays = new();
     private Card currentLeadCard = null;
     private int cardsPlayed = 0;
     private bool gameOver = false;
-    private readonly List<GameHistoryEntry> gameHistory = new();
-    private bool isShuffling = false;
-    private bool isDealing = false;
+    private List<GameHistoryEntry> gameHistory = new();
     private int accumulatedPoints = 0;
     private string lastPlayedSuit = null;
     private Player currentControl;
@@ -53,33 +39,22 @@ public class GameManager : MonoBehaviour
         { "club", "♣" }
     };
 
-    void Start()
+    public void Initialize(List<Player> players, List<Card> deck)
     {
-        // Initialize players
-        humanPlayer ??= new Player("You", "player1");
-
-        computerPlayer ??= new Player("Computer", "player2");
-
-        players.Add(humanPlayer);
-        players.Add(computerPlayer);
-
-        // Initialize current control to first player
+        this.players = players;
+        this.deck = deck;
+        humanPlayer = players[1];
+        computerPlayer = players[0];
         currentControl = players[0];
-
-        // Start the game
         StartGame();
     }
 
     public void StartGame()
     {
-        bool needsShuffle = deck.Count < players.Count * 5 || deck == null;
-
-        // Rotate control to next player
         int currentControlIndex = players.FindIndex(p => p.id == currentControl.id);
         int nextControlIndex = (currentControlIndex + 1) % players.Count;
         currentControl = players[nextControlIndex];
 
-        // Reset game state
         cardsPlayed = 0;
         currentLeadCard = null;
         currentPlays.Clear();
@@ -87,75 +62,10 @@ public class GameManager : MonoBehaviour
         accumulatedPoints = 0;
         lastPlayedSuit = null;
         gameOver = false;
-
-        // Update UI
-        UpdateMessage(needsShuffle ? "Shuffling cards..." : "");
-        startButton.SetActive(currentControl.id == computerPlayer.id);
-        isShuffling = needsShuffle;
-
-        // Start the game sequence
-        StartCoroutine(GameStartSequence(needsShuffle));
     }
 
-    private IEnumerator GameStartSequence(bool needsShuffle)
-    {
-        // Wait if shuffling
-        if (needsShuffle)
-            yield return new WaitForSeconds(2.0f);
-
-        isShuffling = false;
-        UpdateMessage("Dealing cards...");
-
-        // Reset and deal cards
-        if (needsShuffle)
-        {
-            List<Card> tempDeck = deckManager.CreateDeck();
-            deck = deckManager.ShuffleDeck(tempDeck);
-        }
-        var (dealtHands, remainingDeck) = deckManager.DealCards(players, deck);
-        deck = remainingDeck;
-
-        for (int i = 0; i < players.Count; i++)
-        {
-            players[i].hands = dealtHands[i];
-        }
-        UpdateUI();
-
-
-        isDealing = true;
-        yield return new WaitForSeconds(0.5f);
-
-        // Setup turn
-        canPlayCard = currentControl.id == humanPlayer.id;
-        isDealing = false;
-
-        yield return new WaitForSeconds(1.5f);
-
-        UpdateMessage(
-            currentControl.id == computerPlayer.id
-            ? "Press 'Start Game' to start"
-            : "Play a card to start"
-        );
-    }
-
-    public void UpdateUI()
-    {
-        static void Clear(Transform parent)
-        {
-            foreach (Transform child in parent)
-                Destroy(child.gameObject);
-        }
-        Clear(humanHandTransform);
-        Clear(computerHandTransform);
-        Clear(remainingDeckTransform);
-
-        deckManager.SpawnCardsInScene(humanHandTransform, humanPlayer.hands);
-        deckManager.SpawnCardsInScene(computerHandTransform, computerPlayer.hands);
-        deckManager.SpawnCardsInScene(remainingDeckTransform, deck);
-    }
     public void StartButtonClicked()
     {
-        startButton.SetActive(false);
         StartCoroutine(ComputerTurnDelay());
     }
 
@@ -199,30 +109,24 @@ public class GameManager : MonoBehaviour
         UpdateMessage("It's your turn to play.");
     }
 
-    public bool HumanPlayCard(Card card, int handIndex)
+    public bool HumanPlayCard(Card card)
     {
-        if (gameOver)
-        {
-            UpdateMessage("Game is over. No more plays allowed.");
-            return false;
-        }
-
-        if (!canPlayCard)
-        {
-            UpdateMessage("It is not your turn to play.");
-            return false;
-        }
-
-        if (currentPlays.Count == 0 && currentControl.id != humanPlayer.id)
-        {
-            UpdateMessage("It is not your turn to play.");
-            return false;
-        }
-
-        // if (currentPlays.Any(play => play.player.id == humanPlayer.id))
+        // if (gameOver)
         // {
-        //     UpdateMessage("You have already played in this round.");
-        //     return;
+        //     UpdateMessage("Game is over. No more plays allowed.");
+        //     return false;
+        // }
+
+        // if (!canPlayCard)
+        // {
+        //     UpdateMessage("It is not your turn to play.");
+        //     return false;
+        // }
+
+        // if (currentPlays.Count == 0 && currentControl.id != humanPlayer.id)
+        // {
+        //     UpdateMessage("It is not your turn to play.");
+        //     return false;
         // }
 
         // Check if player must follow suit
@@ -247,6 +151,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Remove card from hand
+        int handIndex = humanPlayer.hands.IndexOf(card);
         humanPlayer.hands.RemoveAt(handIndex);
         // UpdateUI();
 
@@ -436,7 +341,6 @@ public class GameManager : MonoBehaviour
     {
         canPlayCard = false;
         gameOver = true;
-        startButton.SetActive(false);
 
         int finalPoints = newAccumulatedPoints == 0 ? pointsEarned : newAccumulatedPoints;
         int humanScore = humanPlayer.score;
@@ -469,12 +373,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // Game over
             Player winner = humanScore >= targetScore ? humanPlayer : computerPlayer;
             UpdateMessage($"Game Over! {winner.name} won the match!");
-
-            // Display final scores
-            // You can implement this based on your UI setup
         }
     }
 
@@ -494,25 +394,7 @@ public class GameManager : MonoBehaviour
     private void AddToGameHistory(string message, bool important)
     {
         gameHistory.Add(new GameHistoryEntry { message = message, importance = important });
-        // UpdateGameHistoryDisplay();
-        gameHistoryText.text = message;
     }
-
-    // private void UpdateGameHistoryDisplay()
-    // {
-    //     // Update your game history UI elements
-    //     if (gameHistoryText != null)
-    //     {
-    //         string historyContent = "";
-    //         foreach (var entry in gameHistory)
-    //         {
-    //             historyContent += entry.importance
-    //                 ? $"<b>{entry.message}</b>\n"
-    //                 : $"{entry.message}\n";
-    //         }
-    //         gameHistoryText.text = historyContent;
-    //     }
-    // }
 
     private void UpdateMessage(string message)
     {

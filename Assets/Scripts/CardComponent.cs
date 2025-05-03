@@ -4,23 +4,27 @@ using UnityEngine;
 public class CardUI : MonoBehaviour
 {
     [HideInInspector] public Card cardData;
-    [HideInInspector] public int handIndex;
+    // [HideInInspector] public int handIndex;
 
     private CardsSetup gm;
     private Vector3 startingPosition;
     private Vector3 destination;
     private bool isMoving;
+    private bool setStartingPos = false;
 
     void Start()
     {
         gm = GameObject.FindGameObjectWithTag("NewGameManager").GetComponent<CardsSetup>();
-        startingPosition = transform.position;
-        destination = startingPosition;  // start with “at home”
     }
 
     void Update()
     {
         if (!isMoving) return;
+        if (!setStartingPos)
+        {
+            startingPosition = transform.position;
+            setStartingPos = true;
+        }
 
         // move from wherever we are _towards_ the current destination
         transform.position = Vector3.MoveTowards(
@@ -32,13 +36,15 @@ public class CardUI : MonoBehaviour
         // if we’ve arrived (within a tiny threshold), stop
         if (Vector3.Distance(transform.position, destination) < 0.01f)
         {
+            gm.audioSource.PlayOneShot(gm.dealSound);
             isMoving = false;
         }
     }
 
     void OnMouseDown()
     {
-        // only start moving if we aren’t already
+        var success = gm.gameClass.HumanPlayCard(cardData);
+        if (!success) return;
         if (isMoving) return;
 
         // toggle destination
