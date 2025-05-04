@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1217977937204623763}
   - component: {fileID: 4921896580540755316}
   - component: {fileID: 8149944113280340460}
-  - component: {fileID: 3748498245123524875}
+  - component: {fileID: -8671883883218297930}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 5.32, y: 7.48}
   m_EdgeRadius: 0
---- !u!114 &3748498245123524875
+--- !u!114 &-8671883883218297930
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5630392647009128151}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 789ae743432ceff46962e9d4deddc249, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a9db5b366743db4ea2cc05c4f5502b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cardData:
@@ -152,4 +152,3 @@ MonoBehaviour:
     rank: 
     value: 0
     sprite: {fileID: 0}
-  handIndex: 0

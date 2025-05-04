@@ -338,8 +338,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 376066847}
-  - component: {fileID: 376066846}
   - component: {fileID: 376066848}
+  - component: {fileID: 376066849}
   m_Layer: 0
   m_Name: CardsSetUp
   m_TagString: NewGameManager
@@ -347,42 +347,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &376066846
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 376066845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7ea9ad64281ec54ebb0cf2f335914f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioSource: {fileID: 376066848}
-  dealSound: {fileID: 8300000, guid: e8fec819ae7548843afa0ee92cda17dc, type: 3}
-  playersHandPosition:
-  - {fileID: 15196450}
-  - {fileID: 392334328}
-  - {fileID: 1650701915}
-  - {fileID: 2137897868}
-  - {fileID: 348158529}
-  opponentsHandPosition:
-  - {fileID: 509441333}
-  - {fileID: 1784609198}
-  - {fileID: 778610119}
-  - {fileID: 1539980197}
-  - {fileID: 1120327205}
-  playSpot: {fileID: 1459225665}
-  playSpot2: {fileID: 1806669284}
-  moveSpeed: 50
-  moveDuration: 0.5
-  dealDelay: 0.3
-  deckTransform: {fileID: 376066847}
-  cardPrefab: {fileID: 5630392647009128151, guid: 12900828291e81d46bf54bb2491bd35c, type: 3}
-  deck: []
-  players: []
-  gameClass: {fileID: 1786043154}
 --- !u!4 &376066847
 Transform:
   m_ObjectHideFlags: 0
@@ -495,6 +459,42 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &376066849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376066845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54e248f4ed089f74ea35b573b1edb961, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 376066848}
+  dealSound: {fileID: 8300000, guid: e8fec819ae7548843afa0ee92cda17dc, type: 3}
+  playersHandPosition:
+  - {fileID: 15196450}
+  - {fileID: 392334328}
+  - {fileID: 1650701915}
+  - {fileID: 2137897868}
+  - {fileID: 348158529}
+  opponentsHandPosition:
+  - {fileID: 509441333}
+  - {fileID: 1784609198}
+  - {fileID: 778610119}
+  - {fileID: 1539980197}
+  - {fileID: 1120327205}
+  playSpot: {fileID: 1459225665}
+  playSpot2: {fileID: 1806669284}
+  moveSpeed: 50
+  moveDuration: 0.5
+  dealDelay: 0.3
+  deckTransform: {fileID: 376066847}
+  cardPrefab: {fileID: 5630392647009128151, guid: 12900828291e81d46bf54bb2491bd35c, type: 3}
+  deck: []
+  players: []
+  gameClass: {fileID: 1786043156}
 --- !u!1 &392334327
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,7 +703,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 339.9121, y: -51.11206}
+  m_AnchoredPosition: {x: 337.5, y: -40.5}
   m_SizeDelta: {x: 652.7642, y: 58.6241}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &647051848
@@ -726,7 +726,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Message
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -753,14 +753,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32.1
-  m_fontSizeBase: 32.1
+  m_fontSize: 29.16
+  m_fontSizeBase: 29.16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1265,12 +1265,12 @@ Canvas:
   m_RenderMode: 0
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1290,6 +1290,7 @@ RectTransform:
   m_Children:
   - {fileID: 1392160667}
   - {fileID: 1392208359}
+  - {fileID: 1405846342}
   - {fileID: 647051847}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1403,7 +1404,7 @@ GameObject:
   - component: {fileID: 1392160669}
   - component: {fileID: 1392160668}
   m_Layer: 5
-  m_Name: Button
+  m_Name: NewGameBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1426,7 +1427,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -74, y: -31.6}
+  m_AnchoredPosition: {x: -74, y: -31.599976}
   m_SizeDelta: {x: 127.795715, y: 32.683716}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1392160668
@@ -1473,7 +1474,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 376066846}
+      - m_Target: {fileID: 376066849}
         m_TargetAssemblyTypeName: CardsSetup, Assembly-CSharp
         m_MethodName: ResetGame
         m_Mode: 1
@@ -1536,12 +1537,12 @@ GameObject:
   - component: {fileID: 1392208361}
   - component: {fileID: 1392208360}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: StartBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1392208359
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1606,7 +1607,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1786043154}
+      - m_Target: {fileID: 1786043156}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: StartButtonClicked
         m_Mode: 1
@@ -1655,6 +1656,142 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392208358}
+  m_CullTransparentMesh: 1
+--- !u!1 &1405846341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1405846342}
+  - component: {fileID: 1405846344}
+  - component: {fileID: 1405846343}
+  m_Layer: 5
+  m_Name: Scores
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1405846342
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405846341}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1126663225}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -99.7, y: 35.3}
+  m_SizeDelta: {x: 129.78998, y: 46.421997}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1405846343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405846341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 27.2
+  m_fontSizeBase: 27.2
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: -188.15332, y: 0, z: -3.578041, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1405846344
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405846341}
   m_CullTransparentMesh: 1
 --- !u!1 &1459225663
 GameObject:
@@ -1974,7 +2111,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Reset
+  m_text: New Game
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2149,7 +2286,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1786043155}
-  - component: {fileID: 1786043154}
+  - component: {fileID: 1786043156}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2157,35 +2294,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1786043154
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1786043153}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdf383a60599c7c4384dd7e7c2bc8aba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  deck: []
-  targetScore: 0
-  computerThinkTime: 0
-  roundDisplayTime: 0
-  humanPlayer:
-    name: 
-    id: 
-    hands: []
-    score: 0
-    status: 0
-  computerPlayer:
-    name: 
-    id: 
-    hands: []
-    score: 0
-    status: 0
-  messageText: {fileID: 647051848}
 --- !u!4 &1786043155
 Transform:
   m_ObjectHideFlags: 0
@@ -2201,6 +2309,39 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1786043156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786043153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7559d8af8b0e50f47b962db035c23498, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deck: []
+  targetScore: 3
+  humanPlayer:
+    name: 
+    id: 
+    hands: []
+    score: 0
+    status: 0
+  computerPlayer:
+    name: 
+    id: 
+    hands: []
+    score: 0
+    status: 0
+  messageText: {fileID: 647051848}
+  playersScoresText: {fileID: 1405846343}
+  startBtn: {fileID: 1392208358}
+  newGameBtn: {fileID: 1392160666}
+  computerCardTODestroy: {fileID: 0}
+  humanCardTODestroy: {fileID: 0}
+  cardsSetup: {fileID: 376066849}
 --- !u!1 &1806669282
 GameObject:
   m_ObjectHideFlags: 0

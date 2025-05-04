@@ -54,5 +54,18 @@ public class CardUI : MonoBehaviour
             : playPos;           // go to play spot
 
         isMoving = true;
+        gm.gameClass.humanCardTODestroy = gameObject;
+    }
+    public void ComputerPlay()
+    {
+        if (isMoving) return;
+
+        // toggle destination
+        var playPos = gm.playSpot2.position;
+        destination = Vector3.Distance(transform.position, playPos) < 0.1f
+            ? startingPosition   // back home
+            : playPos;           // go to play spot
+
+        isMoving = true;
     }
 }

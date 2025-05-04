@@ -36,7 +36,7 @@ public class CardsSetup : MonoBehaviour
     public List<Card> deck = new();
 
     public List<Player> players;
-    private readonly Dictionary<Card, GameObject> cardObjectMap = new();
+    public Dictionary<Card, GameObject> cardObjectMap = new();
     public GameManager gameClass;
 
     IEnumerator Start()
@@ -71,6 +71,7 @@ public class CardsSetup : MonoBehaviour
 
         int numberOfPlayers = allPlayersHandsTransform.Count;
         var (dealtHandsData, remainingDeckData) = DealCards(numberOfPlayers, deck);
+        deck = remainingDeckData;
 
         Player human = new("You", "1234");
         Player computer = new("Computer", "5678");
@@ -91,6 +92,57 @@ public class CardsSetup : MonoBehaviour
 
         yield return StartCoroutine(RepositionRemainingDeckCoroutine(remainingDeckData));
         gameClass.Initialize(players, deck);
+
+        Debug.Log("Card setup and animations complete.");
+    }
+
+    public IEnumerator StartSetup()
+    {
+        if (playersHandPosition == null || opponentsHandPosition == null)
+        {
+            Debug.LogError("Player's Hand or Opponent's Hand transform list is not assigned in the Inspector!");
+            yield break;
+        }
+        if (playersHandPosition.Count == 0 || opponentsHandPosition.Count == 0)
+        {
+            Debug.LogError("Player's Hand or Opponent's Hand transform list is assigned but empty!");
+            yield break;
+        }
+        if (deckTransform == null)
+        {
+            Debug.LogError("Deck Transform is not assigned in the Inspector!");
+            yield break;
+        }
+        if (cardPrefab == null)
+        {
+            Debug.LogError("Card Prefab is not assigned in the Inspector!");
+            yield break;
+        }
+
+        if (deck == null || deck.Count < players.Count * 5)
+        {
+            deck.Clear();
+            DestroyAllCards();
+            Debug.Log("Creating New Deck");
+            List<Card> initialDeckData = CreateDeck();
+            deck = ShuffleDeck(initialDeckData);
+            SpawnCardsInScene(deckTransform, deck);
+        }
+
+        var (dealtHandsData, remainingDeckData) = DealCards(players.Count, deck);
+        deck = remainingDeckData;
+
+        var index = 0;
+        foreach (Player player in players)
+        {
+            player.hands = dealtHandsData[index];
+            yield return StartCoroutine(AssignCardsToPositionsCoroutine(player.hands, allPlayersHandsTransform[index]));
+            index++;
+        }
+
+        Debug.Log($"Dealt cards. Player Hand Count: {dealtHandsData[0].Count}, Opponent Hand Count: {dealtHandsData[1].Count}, Remaining Deck: {remainingDeckData.Count}");
+        if (remainingDeckData.Count >= 22)
+            yield return StartCoroutine(RepositionRemainingDeckCoroutine(remainingDeckData));
 
         Debug.Log("Card setup and animations complete.");
     }
@@ -179,7 +231,6 @@ public class CardsSetup : MonoBehaviour
                 Debug.LogWarning($"Duplicate card data: {card.rank} of {card.suit}. Destroying duplicate GO.", go);
                 Destroy(go); continue;
             }
-            // index++; // No longer needed
         }
         Debug.Log($"Spawned {cardObjectMap.Count} card GameObjects at Deck position.");
     }
@@ -241,7 +292,7 @@ public class CardsSetup : MonoBehaviour
         if (dealtHand.Count != transform.Count)
         {
             Debug.LogError("Mismatch between dealt hands and hand transform lists!");
-            yield break; // Exit coroutine
+            yield break;
         }
         for (int i = 0; i < dealtHand.Count; i++)
         {
@@ -251,8 +302,6 @@ public class CardsSetup : MonoBehaviour
             {
                 StartCoroutine(MoveCardCoroutine(cardGO, targetTransform.position, targetTransform.rotation, moveDuration, "Cards", i));
                 audioSource.PlayOneShot(dealSound);
-                // CardUI ui = cardGO.GetComponent<CardUI>();
-                // if (ui != null) ui.handIndex = i;
                 yield return new WaitForSeconds(dealDelay);
 
             }
@@ -280,20 +329,18 @@ public class CardsSetup : MonoBehaviour
         {
             if (cardObjectMap.TryGetValue(cardData, out GameObject cardGO))
             {
-                Vector3 targetPosition = deckTransform.position + new Vector3(-20, 0, -index * stackOffsetZ);
+                Vector3 targetPosition = deckTransform.position + new Vector3(-20 + index * stackOffsetZ, 0, -index * stackOffsetZ);
                 Quaternion targetRotation = deckTransform.rotation;
 
                 yield return StartCoroutine(MoveCardCoroutine(cardGO, targetPosition, targetRotation, moveDuration / 5, null, 0));
                 audioSource.PlayOneShot(dealSound);
-                // cardGO.transform.position = deckTransform.position + new Vector3(-20 + index * stackOffsetZ, 0, -index * stackOffsetZ);
-                // cardGO.transform.rotation = deckTransform.rotation; // Match deck rotation
-                cardGO.transform.SetParent(deckTransform); // Parent them back to the deck transform
+                cardGO.transform.SetParent(deckTransform);
 
                 SpriteRenderer sr = cardGO.GetComponent<SpriteRenderer>();
                 if (sr != null)
                 {
                     sr.sortingLayerName = "Deck";
-                    sr.sortingOrder = index;
+                    sr.sortingOrder = index + 1;
                 }
             }
             else
@@ -353,5 +400,17 @@ public class CardsSetup : MonoBehaviour
     public void ResetGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    public void DestroyAllCards()
+    {
+        foreach (var cardObject in cardObjectMap.Values)
+        {
+            if (cardObject != null)
+            {
+                Destroy(cardObject);
+            }
+        }
+
+        cardObjectMap.Clear();
     }
 }

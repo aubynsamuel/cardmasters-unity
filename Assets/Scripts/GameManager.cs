@@ -8,8 +8,6 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     public List<Card> deck = new();
     public int targetScore = 10;
-    public float computerThinkTime = 1.5f;
-    public float roundDisplayTime = 1.5f;
 
     [Header("Player Setup")]
     public Player humanPlayer;
@@ -18,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     [Header("UI References")]
     public TMPro.TextMeshProUGUI messageText;
+    public TMPro.TextMeshProUGUI playersScoresText;
+    public GameObject startBtn;
 
     // Game state variables
     private List<Play> currentPlays = new();
@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour
     private string lastPlayedSuit = null;
     private Player currentControl;
     private bool canPlayCard = false;
+    public GameObject computerCardTODestroy;
+    public GameObject humanCardTODestroy;
+
+    public CardsSetup cardsSetup;
 
     // Card symbols for display
     private readonly Dictionary<string, string> suitSymbols = new()
@@ -39,18 +43,23 @@ public class GameManager : MonoBehaviour
         { "club", "♣" }
     };
 
+    void Start()
+    {
+        UpdateScores();
+    }
     public void Initialize(List<Player> players, List<Card> deck)
     {
         this.players = players;
         this.deck = deck;
         humanPlayer = players[1];
         computerPlayer = players[0];
-        currentControl = players[0];
+        currentControl = players[^1];
         StartGame();
     }
 
     public void StartGame()
     {
+        bool needsShuffle = deck == null || deck.Count < players.Count * 5;
         int currentControlIndex = players.FindIndex(p => p.id == currentControl.id);
         int nextControlIndex = (currentControlIndex + 1) % players.Count;
         currentControl = players[nextControlIndex];
@@ -58,25 +67,47 @@ public class GameManager : MonoBehaviour
         cardsPlayed = 0;
         currentLeadCard = null;
         currentPlays.Clear();
+        UpdateMessage(needsShuffle ? "Shuffling cards..." : "");
+        gameOver = false;
+        startBtn.SetActive(currentControl.id == computerPlayer.id);
         gameHistory.Clear();
         accumulatedPoints = 0;
         lastPlayedSuit = null;
-        gameOver = false;
+        currentControl = players[nextControlIndex];
+        StartGameSequence();
+    }
+
+    public void StartGameSequence()
+    {
+        if (players.Any(p => p.score > 0))
+        {
+            StartCoroutine(cardsSetup.StartSetup());
+            deck = cardsSetup.deck;
+            Debug.Log("Deck creation called");
+        }
+        canPlayCard = currentControl.id == humanPlayer.id;
+        UpdateMessage(currentControl.id == computerPlayer.id
+                  ? "Press 'Start Game' to start"
+                  : "Play a card to start");
     }
 
     public void StartButtonClicked()
     {
+        Debug.Log("Start Btn Clicked");
         StartCoroutine(ComputerTurnDelay());
     }
 
     private IEnumerator ComputerTurnDelay()
     {
+        startBtn.SetActive(false);
         yield return new WaitForSeconds(1.5f);
+        Debug.Log("Performing start click action");
         ComputerTurn();
     }
 
     public void ComputerTurn()
     {
+        // Debug.Log("Called Computer Turn");
         if (computerPlayer.hands.Count == 0)
             return;
 
@@ -98,8 +129,10 @@ public class GameManager : MonoBehaviour
         }
 
         // Remove card from hand
+        cardsSetup.cardObjectMap.TryGetValue(cardToPlay, out GameObject cardGO);
+        cardGO.GetComponent<CardUI>().ComputerPlay();
         computerPlayer.hands.Remove(cardToPlay);
-        // UpdateUI();
+        computerCardTODestroy = cardGO;
 
         // Play the card
         PlayCard(computerPlayer, cardToPlay);
@@ -111,23 +144,29 @@ public class GameManager : MonoBehaviour
 
     public bool HumanPlayCard(Card card)
     {
-        // if (gameOver)
-        // {
-        //     UpdateMessage("Game is over. No more plays allowed.");
-        //     return false;
-        // }
+        if (gameOver)
+        {
+            UpdateMessage("Game is over. No more plays allowed.");
+            return false;
+        }
 
-        // if (!canPlayCard)
-        // {
-        //     UpdateMessage("It is not your turn to play.");
-        //     return false;
-        // }
+        if (!canPlayCard)
+        {
+            UpdateMessage("It is not your turn to play.");
+            return false;
+        }
 
-        // if (currentPlays.Count == 0 && currentControl.id != humanPlayer.id)
-        // {
-        //     UpdateMessage("It is not your turn to play.");
-        //     return false;
-        // }
+        if (currentPlays.Count == 0 && currentControl.id != humanPlayer.id)
+        {
+            UpdateMessage("It is not your turn to play.");
+            return false;
+        }
+
+        if (currentPlays.Any((play) => play.player.id == humanPlayer.id))
+        {
+            UpdateMessage("You have already played in this round.");
+            return false;
+        }
 
         // Check if player must follow suit
         if (currentLeadCard != null)
@@ -170,7 +209,7 @@ public class GameManager : MonoBehaviour
         if (isLeading)
         {
             UpdateMessage($"{computerPlayer.name} is thinking...");
-            yield return new WaitForSeconds(computerThinkTime);
+            yield return new WaitForSeconds(0.5f);
             ComputerTurn();
         }
     }
@@ -182,10 +221,7 @@ public class GameManager : MonoBehaviour
 
         // Update round state
         currentPlays.Add(play);
-        if (currentLeadCard == null)
-        {
-            currentLeadCard = card;
-        }
+        currentLeadCard ??= card;
 
         // Add to game history
         AddToGameHistory($"{player.name} played {card.rank}{suitSymbols[card.suit]}", false);
@@ -199,7 +235,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator FinishRoundDelay()
     {
-        yield return new WaitForSeconds(roundDisplayTime);
+        yield return new WaitForSeconds(1f);
         FinishRound();
     }
 
@@ -209,7 +245,7 @@ public class GameManager : MonoBehaviour
         Play secondPlay = currentPlays[1];
         Player newControl;
         string resultMessage;
-        int pointsEarned = 0;
+        int pointsEarned;
 
         if (currentLeadCard == null)
             return;
@@ -234,12 +270,11 @@ public class GameManager : MonoBehaviour
         }
 
         // Calculate points
-        int newAccumulatedPoints = accumulatedPoints;
+        int newAccumulatedPoints;
         string newLastPlayedSuit = lastPlayedSuit;
 
         if (currentControl.id != newControl.id)
         {
-            newAccumulatedPoints = 0;
             newLastPlayedSuit = null;
         }
 
@@ -301,8 +336,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator PrepareNextRound(Player newControl, int newAccumulatedPoints, int pointsEarned)
     {
-        yield return new WaitForSeconds(roundDisplayTime);
-
         // Reset round state
         ResetRound();
         int newRoundsPlayed = cardsPlayed + 1;
@@ -319,7 +352,8 @@ public class GameManager : MonoBehaviour
                 canPlayCard = false;
                 UpdateMessage($"{computerPlayer.name} is playing.");
 
-                yield return new WaitForSeconds(computerThinkTime);
+                yield return new WaitForSeconds(1f);
+                Debug.Log("Computer Playing");
                 ComputerTurn();
             }
             else
@@ -335,28 +369,33 @@ public class GameManager : MonoBehaviour
         canPlayCard = false;
         currentLeadCard = null;
         currentPlays.Clear();
+        Destroy(computerCardTODestroy);
+        Destroy(humanCardTODestroy);
     }
 
     private void HandleGameOver(Player winningPlayer, int newAccumulatedPoints, int pointsEarned)
     {
         canPlayCard = false;
         gameOver = true;
+        startBtn.SetActive(false);
+
 
         int finalPoints = newAccumulatedPoints == 0 ? pointsEarned : newAccumulatedPoints;
-        int humanScore = humanPlayer.score;
-        int computerScore = computerPlayer.score;
+        int humanScore = 0;
+        int computerScore = 0;
 
         // Award points to winner
         if (winningPlayer.id == computerPlayer.id)
         {
-            computerScore += finalPoints;
+            computerScore += computerPlayer.score + finalPoints;
             computerPlayer.score = computerScore;
         }
         else
         {
-            humanScore += finalPoints;
+            humanScore += humanPlayer.score + finalPoints;
             humanPlayer.score = humanScore;
         }
+        UpdateScores();
 
         // Update game message
         UpdateMessage(
@@ -366,21 +405,21 @@ public class GameManager : MonoBehaviour
         );
 
         // Check if target score reached
+        Debug.Log($"Computer {computerScore} Human {humanScore}");
         if (computerScore < targetScore && humanScore < targetScore)
         {
-            // Continue to next game
             StartCoroutine(StartNextGame());
         }
         else
         {
             Player winner = humanScore >= targetScore ? humanPlayer : computerPlayer;
-            UpdateMessage($"Game Over! {winner.name} won the match!");
+            UpdateMessage($"Game Over! {winner.name} won");
         }
     }
 
     private IEnumerator StartNextGame()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(2f);
         StartGame();
     }
 
@@ -400,6 +439,11 @@ public class GameManager : MonoBehaviour
     {
         if (messageText != null)
             messageText.text = message;
-        Debug.Log("Game Message: " + message);
+        // Debug.Log("Game Message: " + message);
+    }
+
+    private void UpdateScores()
+    {
+        playersScoresText.text = $"Computer {computerPlayer.score} vs {humanPlayer.score} Human";
     }
 }
