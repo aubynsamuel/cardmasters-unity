@@ -4,8 +4,7 @@ using UnityEngine;
 public class CardUI : MonoBehaviour
 {
     [HideInInspector] public Card cardData;
-    // [HideInInspector] public int handIndex;
-
+    public float moveSpeed = 50f;
     private CardsSetup gm;
     private Vector3 startingPosition;
     private Vector3 destination;
@@ -30,7 +29,7 @@ public class CardUI : MonoBehaviour
         transform.position = Vector3.MoveTowards(
             transform.position,
             destination,
-            gm.moveSpeed * Time.deltaTime
+            moveSpeed * Time.deltaTime
         );
 
         // if we’ve arrived (within a tiny threshold), stop

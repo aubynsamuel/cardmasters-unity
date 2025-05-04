@@ -128,7 +128,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 5, y: 7.26}
-    newSize: {x: 5, y: 7.26}
+    newSize: {x: 2.64, y: 3.88}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -152,3 +152,4 @@ MonoBehaviour:
     rank: 
     value: 0
     sprite: {fileID: 0}
+    cardBack: {fileID: 0}

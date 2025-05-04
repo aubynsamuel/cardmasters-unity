@@ -7,4 +7,5 @@ public class Card
     public string rank;
     public int value;
     public Sprite sprite;
+    public Sprite cardBack;
 }

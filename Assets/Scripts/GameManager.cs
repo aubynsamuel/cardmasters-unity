@@ -5,13 +5,14 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
+    public GameHistoryUI historyUI;
+    [HideInInspector] public List<Card> deck = new();
+
     [Header("Game Settings")]
-    public List<Card> deck = new();
     public int targetScore = 10;
 
-    [Header("Player Setup")]
-    public Player humanPlayer;
-    public Player computerPlayer;
+    [HideInInspector] public Player humanPlayer;
+    [HideInInspector] public Player computerPlayer;
     private List<Player> players = new();
 
     [Header("UI References")]
@@ -20,17 +21,17 @@ public class GameManager : MonoBehaviour
     public GameObject startBtn;
 
     // Game state variables
-    private List<Play> currentPlays = new();
+    private readonly List<Play> currentPlays = new();
     private Card currentLeadCard = null;
     private int cardsPlayed = 0;
     private bool gameOver = false;
-    private List<GameHistoryEntry> gameHistory = new();
+    // private readonly List<GameHistoryEntry> gameHistory = new();
     private int accumulatedPoints = 0;
     private string lastPlayedSuit = null;
     private Player currentControl;
     private bool canPlayCard = false;
-    public GameObject computerCardTODestroy;
-    public GameObject humanCardTODestroy;
+    [HideInInspector] public GameObject computerCardTODestroy;
+    [HideInInspector] public GameObject humanCardTODestroy;
 
     public CardsSetup cardsSetup;
 
@@ -70,7 +71,8 @@ public class GameManager : MonoBehaviour
         UpdateMessage(needsShuffle ? "Shuffling cards..." : "");
         gameOver = false;
         startBtn.SetActive(currentControl.id == computerPlayer.id);
-        gameHistory.Clear();
+        // gameHistory.Clear();
+        historyUI.ClearMessages();
         accumulatedPoints = 0;
         lastPlayedSuit = null;
         currentControl = players[nextControlIndex];
@@ -81,13 +83,13 @@ public class GameManager : MonoBehaviour
     {
         if (players.Any(p => p.score > 0))
         {
-            StartCoroutine(cardsSetup.StartSetup());
+            StartCoroutine(cardsSetup.StartSetup(players.IndexOf(currentControl)));
             deck = cardsSetup.deck;
             Debug.Log("Deck creation called");
         }
         canPlayCard = currentControl.id == humanPlayer.id;
         UpdateMessage(currentControl.id == computerPlayer.id
-                  ? "Press 'Start Game' to start"
+                  ? "Press 'Start' to start"
                   : "Play a card to start");
     }
 
@@ -413,6 +415,10 @@ public class GameManager : MonoBehaviour
         else
         {
             Player winner = humanScore >= targetScore ? humanPlayer : computerPlayer;
+            if (winner.id == humanPlayer.id)
+                cardsSetup.audioSource.PlayOneShot(cardsSetup.winSound);
+            else
+                cardsSetup.audioSource.PlayOneShot(cardsSetup.loseSound);
             UpdateMessage($"Game Over! {winner.name} won");
         }
     }
@@ -432,7 +438,8 @@ public class GameManager : MonoBehaviour
 
     private void AddToGameHistory(string message, bool important)
     {
-        gameHistory.Add(new GameHistoryEntry { message = message, importance = important });
+        // gameHistory.Add(new GameHistoryEntry { message = message, importance = important });
+        historyUI.AddMessage(message, important);
     }
 
     private void UpdateMessage(string message)

@@ -49,5 +49,8 @@ TagManager:
   - name: HumanCards
     uniqueID: 3747359711
     locked: 0
+  - name: Cards
+    uniqueID: 1492498165
+    locked: 0
   m_RenderingLayers:
   - Default
