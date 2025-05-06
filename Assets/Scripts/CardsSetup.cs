@@ -97,15 +97,8 @@ public class CardsSetup : MonoBehaviour
             yield return StartCoroutine(AssignCardsToPositionsCoroutine(player.hands, allPlayersHandsTransform[index], showFace));
             index++;
         }
-
-        Debug.Log($"Dealt cards. Player Hand Count: {dealtHandsData[0].Count}, Opponent Hand Count: {dealtHandsData[1].Count}, Remaining Deck: {remainingDeckData.Count}");
-
-        // yield return StartCoroutine(AssignCardsToPositionsCoroutine(dealtHandsData));
-
         yield return StartCoroutine(RepositionRemainingDeckCoroutine(remainingDeckData));
         gameClass.Initialize(players, deck);
-
-        Debug.Log("Card setup and animations complete.");
     }
 
     public IEnumerator StartSetup(int startIndex, string humanId)
@@ -135,7 +128,6 @@ public class CardsSetup : MonoBehaviour
         {
             deck.Clear();
             DestroyAllCards();
-            Debug.Log("Creating New Deck");
             List<Card> initialDeckData = CreateDeck();
             deck = ShuffleDeck(initialDeckData);
             SpawnCardsInScene(deckTransform, deck);
@@ -154,11 +146,8 @@ public class CardsSetup : MonoBehaviour
             yield return StartCoroutine(AssignCardsToPositionsCoroutine(players[index].hands, allPlayersHandsTransform[index], showFace));
         }
 
-        Debug.Log($"Dealt cards. Player Hand Count: {dealtHandsData[0].Count}, Opponent Hand Count: {dealtHandsData[1].Count}, Remaining Deck: {remainingDeckData.Count}");
         if (remainingDeckData.Count >= 22)
             yield return StartCoroutine(RepositionRemainingDeckCoroutine(remainingDeckData));
-
-        Debug.Log("Card setup and animations complete.");
     }
 
     #region Unchanged Methods
@@ -201,7 +190,6 @@ public class CardsSetup : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Created deck data with " + newDeck.Count + " cards.");
         return newDeck;
     }
 
@@ -213,7 +201,6 @@ public class CardsSetup : MonoBehaviour
             n--; int k = rng.Next(n + 1);
             (deckToShuffle[k], deckToShuffle[n]) = (deckToShuffle[n], deckToShuffle[k]);
         }
-        Debug.Log("Deck data shuffled.");
         return deckToShuffle;
     }
 
@@ -249,7 +236,6 @@ public class CardsSetup : MonoBehaviour
                 Destroy(go); continue;
             }
         }
-        Debug.Log($"Spawned {cardObjectMap.Count} card GameObjects at Deck position.");
     }
 
     public (List<List<Card>> dealtHands, List<Card> remainingDeck) DealCards(int totalPlayersHands, List<Card> currentDeck)
@@ -257,7 +243,6 @@ public class CardsSetup : MonoBehaviour
         List<List<Card>> dealtHands = new();
         for (int i = 0; i < totalPlayersHands; i++) { dealtHands.Add(new List<Card>()); }
 
-        int cardsToDealPerPlayer = 5; // Total cards per player
         int cardsInFirstRound = 3;
         int cardsInSecondRound = 2;
 
@@ -298,12 +283,10 @@ public class CardsSetup : MonoBehaviour
         }
 
     EndDeal:;
-        Debug.Log($"Dealing complete. {totalPlayersHands} hands dealt. (~{cardsToDealPerPlayer} cards each).");
         return (dealtHands, currentDeck);
     }
     #endregion
 
-    // Moves the GameObjects associated with dealt cards to their hand positions
     public IEnumerator AssignCardsToPositionsCoroutine(List<Card> dealtHand, List<Transform> transform, bool showFace = false)
     {
         if (dealtHand.Count != transform.Count)
@@ -334,7 +317,6 @@ public class CardsSetup : MonoBehaviour
         }
     }
 
-    // Move the GameObjects for the cards still in the deck back to the deck pile visual
     IEnumerator RepositionRemainingDeckCoroutine(List<Card> remainingCards)
     {
         float stackOffsetZ = 0.1f;
@@ -371,11 +353,9 @@ public class CardsSetup : MonoBehaviour
             index++;
 
         }
-        Debug.Log($"Finished animations for {index} remaining deck cards.");
     }
 
 
-    // --- Generic Coroutine to move a single card ---
     IEnumerator MoveCardCoroutine(GameObject cardToMove, Vector3 targetPosition, Quaternion targetRotation, float duration, string targetSortingLayer, int targetSortingOrder)
     {
         Vector3 startPosition = cardToMove.transform.position;
@@ -387,13 +367,11 @@ public class CardsSetup : MonoBehaviour
         {
             sr.sortingLayerName = "MovingCard";
             sr.sortingOrder = 100;
-            // sr.sprite = cardToMove.GetComponent<CardUI>().cardData.cardBack;
         }
 
 
         while (elapsedTime < duration)
         {
-            // Prevent errors if the object is destroyed mid-animation
             if (cardToMove == null) yield break;
 
             elapsedTime += Time.deltaTime;
@@ -428,7 +406,6 @@ public class CardsSetup : MonoBehaviour
     /// <param name="deckSpawnPoint">The transform representing the deck's position and rotation.</param>
     public IEnumerator AnimateDeckSpawnCoroutine(Dictionary<Card, GameObject> cardsToAnimate, Transform deckSpawnPoint)
     {
-        Debug.Log($"Starting deck spawn animation for {cardsToAnimate.Count} cards...");
         if (deckSpawnPoint == null)
         {
             Debug.LogError("Deck Spawn Point is null for animation.");
@@ -472,8 +449,6 @@ public class CardsSetup : MonoBehaviour
         // This ensures the game doesn't proceed before the visual flourish is mostly done.
         float approxWaitTime = spawnAnimationUpDuration + spawnAnimationDownDuration;
         yield return new WaitForSeconds(approxWaitTime); // Wait for the duration of one full animation after the last one starts
-
-        Debug.Log("Deck spawn animation sequence complete.");
     }
 
     /// <summary>

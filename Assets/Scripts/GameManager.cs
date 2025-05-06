@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector] public Player humanPlayer;
     [HideInInspector] public Player computerPlayer;
+    public GameObject HumanControlIndicator;
+    public GameObject ComputerControlIndicator;
     private List<Player> players = new();
 
     [Header("UI References")]
@@ -21,10 +23,10 @@ public class GameManager : MonoBehaviour
     public TMPro.TextMeshProUGUI computerScoreText;
     public TMPro.TextMeshProUGUI targetScoreText;
     public TMPro.TextMeshProUGUI targetScoreTextSettings;
+    public TMPro.TextMeshProUGUI accumulatedPointsText;
+
     public float popUpScale = 2f;
-    public float popUpDuration = 0.3f;
-    private int previousHumanScore;
-    private int previousComputerScore;
+    public float popUpDuration = 0.2f;
     public GameObject startBtn;
 
     // Game state variables
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour
     private int cardsPlayed = 0;
     private bool gameOver = false;
     // private readonly List<GameHistoryEntry> gameHistory = new();
-    private int accumulatedPoints = 0;
+    public int accumulatedPoints = 0;
     private string lastPlayedSuit = null;
     private Player currentControl;
     private bool canPlayCard = false;
@@ -41,6 +43,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public GameObject humanCardTODestroy;
 
     public CardsSetup cardsSetup;
+    [SerializeField] private readonly float animationDuration = 0.25f;
+    private Vector3 originalScale;
 
     // Card symbols for display
     private readonly Dictionary<string, string> suitSymbols = new()
@@ -53,12 +57,36 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        previousHumanScore = humanPlayer.score;
-        previousComputerScore = computerPlayer.score;
         targetScoreText.text = targetScore.ToString();
         targetScoreTextSettings.text = targetScore.ToString();
-        UpdateScores();
+        accumulatedPointsText.text = accumulatedPoints.ToString();
+        originalScale = ComputerControlIndicator.transform.localScale;
+        UpdateScores(WhatChanged.NOTHING);
+        UpdateAccumulatedPoints();
     }
+
+    void UpdateControlIndicator()
+    {
+        if (currentControl == null || humanPlayer == null || computerPlayer == null)
+            return;
+
+        bool isHuman = currentControl.id == humanPlayer.id;
+        // human indicator
+        StartCoroutine(AnimateScale(
+            HumanControlIndicator.transform,
+            HumanControlIndicator.transform.localScale,
+            isHuman ? originalScale : Vector3.zero,
+            animationDuration
+        ));
+        // computer indicator
+        StartCoroutine(AnimateScale(
+            ComputerControlIndicator.transform,
+            ComputerControlIndicator.transform.localScale,
+            isHuman ? Vector3.zero : originalScale,
+            animationDuration
+        ));
+    }
+
     public void Initialize(List<Player> players, List<Card> deck)
     {
         this.players = players;
@@ -75,6 +103,7 @@ public class GameManager : MonoBehaviour
         int currentControlIndex = players.FindIndex(p => p.id == currentControl.id);
         int nextControlIndex = (currentControlIndex + 1) % players.Count;
         currentControl = players[nextControlIndex];
+        UpdateControlIndicator();
 
         cardsPlayed = 0;
         currentLeadCard = null;
@@ -85,8 +114,8 @@ public class GameManager : MonoBehaviour
         // gameHistory.Clear();
         historyUI.ClearMessages();
         accumulatedPoints = 0;
+        UpdateAccumulatedPoints();
         lastPlayedSuit = null;
-        currentControl = players[nextControlIndex];
         StartGameSequence();
     }
 
@@ -96,7 +125,6 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(cardsSetup.StartSetup(players.IndexOf(currentControl), humanPlayer.id));
             deck = cardsSetup.deck;
-            Debug.Log("Deck creation called");
         }
         canPlayCard = currentControl.id == humanPlayer.id;
         UpdateMessage(currentControl.id == computerPlayer.id
@@ -106,7 +134,6 @@ public class GameManager : MonoBehaviour
 
     public void StartButtonClicked()
     {
-        Debug.Log("Start Btn Clicked");
         StartCoroutine(ComputerTurnDelay());
     }
 
@@ -114,13 +141,11 @@ public class GameManager : MonoBehaviour
     {
         startBtn.SetActive(false);
         yield return new WaitForSeconds(1.5f);
-        Debug.Log("Performing start click action");
         ComputerTurn();
     }
 
     public void ComputerTurn()
     {
-        // Debug.Log("Called Computer Turn");
         if (computerPlayer.hands.Count == 0)
             return;
 
@@ -338,9 +363,11 @@ public class GameManager : MonoBehaviour
 
         // Update game state
         currentControl = newControl;
+        UpdateControlIndicator();
         UpdateMessage(resultMessage);
         AddToGameHistory($"{newControl.name} Won Round {cardsPlayed + 1}", true);
         accumulatedPoints = newAccumulatedPoints;
+        UpdateAccumulatedPoints();
         lastPlayedSuit = newLastPlayedSuit;
 
         // Reset round and prepare for next
@@ -366,7 +393,6 @@ public class GameManager : MonoBehaviour
                 UpdateMessage($"{computerPlayer.name} is playing");
 
                 yield return new WaitForSeconds(1f);
-                Debug.Log("Computer Playing");
                 ComputerTurn();
             }
             else
@@ -402,23 +428,22 @@ public class GameManager : MonoBehaviour
         {
             computerScore += computerPlayer.score + finalPoints;
             computerPlayer.score = computerScore;
+            UpdateScores(WhatChanged.COMPUTER);
         }
         else
         {
             humanScore += humanPlayer.score + finalPoints;
             humanPlayer.score = humanScore;
+            UpdateScores(WhatChanged.HUMAN);
         }
-        UpdateScores();
 
         // Update game message
         UpdateMessage(
             winningPlayer.id == humanPlayer.id
-            ? $"🏆 You won this game! +{finalPoints} 🏆"
-            : $"🏆 {computerPlayer.name} won this game! +{finalPoints} 🏆"
+            ? $"You won this game! +{finalPoints}"
+            : $"{computerPlayer.name} won this game! +{finalPoints}"
         );
 
-        // Check if target score reached
-        Debug.Log($"Computer {computerScore} Human {humanScore}");
         if (computerScore < targetScore && humanScore < targetScore)
         {
             StartCoroutine(StartNextGame());
@@ -457,13 +482,25 @@ public class GameManager : MonoBehaviour
     {
         if (messageText != null)
             messageText.text = message;
-        // Debug.Log("Game Message: " + message);
     }
 
-    private void UpdateScores()
+    private void UpdateScores(WhatChanged whatChanged)
     {
         humanScoreText.text = humanPlayer.score.ToString();
         computerScoreText.text = computerPlayer.score.ToString();
+        if (whatChanged.Equals(WhatChanged.HUMAN))
+            StartCoroutine(AnimateScorePop(humanScoreText.transform));
+        else if (whatChanged.Equals(WhatChanged.COMPUTER))
+            StartCoroutine(AnimateScorePop(computerScoreText.transform));
+    }
+    private void UpdateAccumulatedPoints()
+    {
+        if (accumulatedPoints > 0)
+            accumulatedPointsText.gameObject.SetActive(true);
+        else
+            accumulatedPointsText.gameObject.SetActive(false);
+        accumulatedPointsText.text = $"+{accumulatedPoints}";
+        StartCoroutine(AnimateScorePop(accumulatedPointsText.transform));
     }
 
     public void IncreaseTargetScore()
@@ -477,23 +514,6 @@ public class GameManager : MonoBehaviour
         targetScore--;
         targetScoreText.text = targetScore.ToString();
         targetScoreTextSettings.text = targetScore.ToString();
-    }
-
-    void Update()
-    {
-        if (humanPlayer.score != previousHumanScore)
-        {
-            StartCoroutine(AnimateScorePop(humanScoreText.transform));
-            humanScoreText.text = humanPlayer.score.ToString();
-            previousHumanScore = humanPlayer.score;
-        }
-
-        if (computerPlayer.score != previousComputerScore)
-        {
-            StartCoroutine(AnimateScorePop(computerScoreText.transform));
-            computerScoreText.text = computerPlayer.score.ToString();
-            previousComputerScore = computerPlayer.score;
-        }
     }
 
     IEnumerator AnimateScorePop(Transform textTransform)
@@ -521,4 +541,29 @@ public class GameManager : MonoBehaviour
 
         textTransform.localScale = originalScale; // Ensure it returns to the original scale
     }
+    private IEnumerator AnimateScale(Transform target, Vector3 from, Vector3 to, float duration)
+    {
+        float elapsed = 0f;
+        target.localScale = from;
+        target.gameObject.SetActive(true);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            target.localScale = Vector3.Lerp(from, to, t);
+            yield return null;
+        }
+
+        target.localScale = to;
+
+        if (to == Vector3.zero)
+            target.gameObject.SetActive(false);
+    }
+
+}
+
+public enum WhatChanged
+{
+    HUMAN, COMPUTER, NOTHING
 }
