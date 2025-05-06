@@ -440,7 +440,7 @@ public class GameManager : MonoBehaviour
         // Update game message
         UpdateMessage(
             winningPlayer.id == humanPlayer.id
-            ? $"You won this game! +{finalPoints}"
+            ? $"You won this game +{finalPoints}"
             : $"{computerPlayer.name} won this game! +{finalPoints}"
         );
 
@@ -455,7 +455,7 @@ public class GameManager : MonoBehaviour
                 cardsSetup.audioSource.PlayOneShot(cardsSetup.winSound);
             else
                 cardsSetup.audioSource.PlayOneShot(cardsSetup.loseSound);
-            UpdateMessage($"Game Over! {winner.name} won");
+            UpdateMessage($"Game Over {winner.name} won");
         }
     }
 
