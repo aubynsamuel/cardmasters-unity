@@ -515,6 +515,10 @@ public class GameManager : MonoBehaviour
         targetScoreText.text = targetScore.ToString();
         targetScoreTextSettings.text = targetScore.ToString();
     }
+    public void Exit()
+    {
+        Application.Quit();
+    }
 
     IEnumerator AnimateScorePop(Transform textTransform)
     {
