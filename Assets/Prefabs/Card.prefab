@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4921896580540755316}
   - component: {fileID: 8149944113280340460}
   - component: {fileID: -8671883883218297930}
+  - component: {fileID: 4024487342939286242}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -128,7 +129,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 5, y: 7.26}
-    newSize: {x: 2.64, y: 3.88}
+    newSize: {x: 5, y: 7.26}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -153,3 +154,22 @@ MonoBehaviour:
     value: 0
     sprite: {fileID: 0}
     cardBack: {fileID: 0}
+  moveSpeed: 80
+  cardShake: {fileID: 0}
+--- !u!114 &4024487342939286242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5630392647009128151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3ff6d17fa338ab43a2a6c7397ff655c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shakeDuration: 0.3
+  horizontalMagnitude: 0.3
+  verticalMagnitude: 0.02
+  shakeFrequency: 35
+  isSuccess: 0

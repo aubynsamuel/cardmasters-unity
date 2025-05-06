@@ -6,6 +6,7 @@ TagManager:
   tags:
   - GameManagerTag
   - NewGameManager
+  - CardShake
   layers:
   - Default
   - TransparentFX

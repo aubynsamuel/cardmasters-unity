@@ -10,10 +10,14 @@ public class CardUI : MonoBehaviour
     private Vector3 destination;
     private bool isMoving;
     private bool setStartingPos = false;
+    private bool invokedByComputer = false;
+    public CardShake cardShake;
+    public bool isClickable = false;
 
     void Start()
     {
         gm = GameObject.FindGameObjectWithTag("NewGameManager").GetComponent<CardsSetup>();
+        cardShake = gameObject.GetComponent<CardShake>();
     }
 
     void Update()
@@ -37,13 +41,20 @@ public class CardUI : MonoBehaviour
         {
             gm.audioSource.PlayOneShot(gm.dealSound);
             isMoving = false;
+            if (invokedByComputer)
+            {
+                SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+                if (sr != null) { sr.sprite = cardData.sprite; }
+            }
         }
     }
 
     void OnMouseDown()
     {
+        if (!isClickable) return;
         var success = gm.gameClass.HumanPlayCard(cardData);
-        if (!success) return;
+        if (!success) return; else cardShake.isSuccess = true;
+
         if (isMoving) return;
 
         // toggle destination
@@ -66,5 +77,6 @@ public class CardUI : MonoBehaviour
             : playPos;           // go to play spot
 
         isMoving = true;
+        invokedByComputer = true;
     }
 }

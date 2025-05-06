@@ -92,8 +92,9 @@ public class CardsSetup : MonoBehaviour
         var index = 0;
         foreach (Player player in players)
         {
+            bool showFace = player.id == human.id;
             player.hands = dealtHandsData[index];
-            yield return StartCoroutine(AssignCardsToPositionsCoroutine(player.hands, allPlayersHandsTransform[index]));
+            yield return StartCoroutine(AssignCardsToPositionsCoroutine(player.hands, allPlayersHandsTransform[index], showFace));
             index++;
         }
 
@@ -107,7 +108,7 @@ public class CardsSetup : MonoBehaviour
         Debug.Log("Card setup and animations complete.");
     }
 
-    public IEnumerator StartSetup(int startIndex)
+    public IEnumerator StartSetup(int startIndex, string humanId)
     {
         if (playersHandPosition == null || opponentsHandPosition == null)
         {
@@ -148,8 +149,9 @@ public class CardsSetup : MonoBehaviour
         for (int i = 0; i < players.Count; i++)
         {
             var index = (startIndex + i) % players.Count;
+            bool showFace = players[index].id == humanId;
             players[index].hands = dealtHandsData[index];
-            yield return StartCoroutine(AssignCardsToPositionsCoroutine(players[index].hands, allPlayersHandsTransform[index]));
+            yield return StartCoroutine(AssignCardsToPositionsCoroutine(players[index].hands, allPlayersHandsTransform[index], showFace));
         }
 
         Debug.Log($"Dealt cards. Player Hand Count: {dealtHandsData[0].Count}, Opponent Hand Count: {dealtHandsData[1].Count}, Remaining Deck: {remainingDeckData.Count}");
@@ -224,7 +226,7 @@ public class CardsSetup : MonoBehaviour
             go.name = $"Card_{card.rank}_{card.suit}";
 
             SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
-            if (sr != null) { sr.sprite = card.sprite; }
+            if (sr != null) { sr.sprite = card.cardBack; }
             else { Debug.LogError($"Card Prefab '{cardPrefab.name}' missing SpriteRenderer.", cardPrefab); }
 
             CardUI ui = go.GetComponent<CardUI>();
@@ -302,7 +304,7 @@ public class CardsSetup : MonoBehaviour
     #endregion
 
     // Moves the GameObjects associated with dealt cards to their hand positions
-    public IEnumerator AssignCardsToPositionsCoroutine(List<Card> dealtHand, List<Transform> transform)
+    public IEnumerator AssignCardsToPositionsCoroutine(List<Card> dealtHand, List<Transform> transform, bool showFace = false)
     {
         if (dealtHand.Count != transform.Count)
         {
@@ -315,6 +317,12 @@ public class CardsSetup : MonoBehaviour
             Transform targetTransform = transform[i];
             if (cardObjectMap.TryGetValue(cardData, out GameObject cardGO))
             {
+                if (showFace)
+                {
+                    SpriteRenderer sr = cardGO.GetComponent<SpriteRenderer>();
+                    if (sr != null) { sr.sprite = cardData.sprite; }
+                    cardGO.GetComponent<CardUI>().isClickable = true;
+                }
                 StartCoroutine(MoveCardCoroutine(cardGO, targetTransform.position, targetTransform.rotation, moveDuration, "Cards", i));
                 audioSource.PlayOneShot(dealSound);
                 yield return new WaitForSeconds(dealDelay);

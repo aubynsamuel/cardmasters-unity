@@ -17,7 +17,14 @@ public class GameManager : MonoBehaviour
 
     [Header("UI References")]
     public TMPro.TextMeshProUGUI messageText;
-    public TMPro.TextMeshProUGUI playersScoresText;
+    public TMPro.TextMeshProUGUI humanScoreText;
+    public TMPro.TextMeshProUGUI computerScoreText;
+    public TMPro.TextMeshProUGUI targetScoreText;
+    public TMPro.TextMeshProUGUI targetScoreTextSettings;
+    public float popUpScale = 2f;
+    public float popUpDuration = 0.3f;
+    private int previousHumanScore;
+    private int previousComputerScore;
     public GameObject startBtn;
 
     // Game state variables
@@ -46,6 +53,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        previousHumanScore = humanPlayer.score;
+        previousComputerScore = computerPlayer.score;
+        targetScoreText.text = targetScore.ToString();
+        targetScoreTextSettings.text = targetScore.ToString();
         UpdateScores();
     }
     public void Initialize(List<Player> players, List<Card> deck)
@@ -83,7 +94,7 @@ public class GameManager : MonoBehaviour
     {
         if (players.Any(p => p.score > 0))
         {
-            StartCoroutine(cardsSetup.StartSetup(players.IndexOf(currentControl)));
+            StartCoroutine(cardsSetup.StartSetup(players.IndexOf(currentControl), humanPlayer.id));
             deck = cardsSetup.deck;
             Debug.Log("Deck creation called");
         }
@@ -141,32 +152,32 @@ public class GameManager : MonoBehaviour
 
         // Setup for human turn
         canPlayCard = true;
-        UpdateMessage("It's your turn to play.");
+        UpdateMessage("It's your turn to play");
     }
 
     public bool HumanPlayCard(Card card)
     {
         if (gameOver)
         {
-            UpdateMessage("Game is over. No more plays allowed.");
+            UpdateMessage("Game is over");
             return false;
         }
 
         if (!canPlayCard)
         {
-            UpdateMessage("It is not your turn to play.");
+            UpdateMessage("It is not your turn to play");
             return false;
         }
 
         if (currentPlays.Count == 0 && currentControl.id != humanPlayer.id)
         {
-            UpdateMessage("It is not your turn to play.");
+            UpdateMessage("It is not your turn to play");
             return false;
         }
 
         if (currentPlays.Any((play) => play.player.id == humanPlayer.id))
         {
-            UpdateMessage("You have already played in this round.");
+            UpdateMessage("You have already played");
             return false;
         }
 
@@ -178,7 +189,7 @@ public class GameManager : MonoBehaviour
 
             if (hasRequired && card.suit != requiredSuit)
             {
-                UpdateMessage($"You must play a {suitSymbols[requiredSuit]} if you have one");
+                UpdateMessage($"You must play a {suitSymbols[requiredSuit]}");
                 return false;
             }
             else
@@ -352,7 +363,7 @@ public class GameManager : MonoBehaviour
             if (newControl.id == computerPlayer.id)
             {
                 canPlayCard = false;
-                UpdateMessage($"{computerPlayer.name} is playing.");
+                UpdateMessage($"{computerPlayer.name} is playing");
 
                 yield return new WaitForSeconds(1f);
                 Debug.Log("Computer Playing");
@@ -361,7 +372,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 canPlayCard = true;
-                UpdateMessage("It's your turn to play.");
+                UpdateMessage("It's your turn to play");
             }
         }
     }
@@ -402,8 +413,8 @@ public class GameManager : MonoBehaviour
         // Update game message
         UpdateMessage(
             winningPlayer.id == humanPlayer.id
-            ? $"🏆 You won this game with {finalPoints} points! 🏆"
-            : $"🏆 {computerPlayer.name} won this game with {finalPoints} points! 🏆"
+            ? $"🏆 You won this game! +{finalPoints} 🏆"
+            : $"🏆 {computerPlayer.name} won this game! +{finalPoints} 🏆"
         );
 
         // Check if target score reached
@@ -451,6 +462,63 @@ public class GameManager : MonoBehaviour
 
     private void UpdateScores()
     {
-        playersScoresText.text = $"Computer {computerPlayer.score} vs {humanPlayer.score} Human";
+        humanScoreText.text = humanPlayer.score.ToString();
+        computerScoreText.text = computerPlayer.score.ToString();
+    }
+
+    public void IncreaseTargetScore()
+    {
+        targetScore++;
+        targetScoreText.text = targetScore.ToString();
+        targetScoreTextSettings.text = targetScore.ToString();
+    }
+    public void DecreaseTargetScore()
+    {
+        targetScore--;
+        targetScoreText.text = targetScore.ToString();
+        targetScoreTextSettings.text = targetScore.ToString();
+    }
+
+    void Update()
+    {
+        if (humanPlayer.score != previousHumanScore)
+        {
+            StartCoroutine(AnimateScorePop(humanScoreText.transform));
+            humanScoreText.text = humanPlayer.score.ToString();
+            previousHumanScore = humanPlayer.score;
+        }
+
+        if (computerPlayer.score != previousComputerScore)
+        {
+            StartCoroutine(AnimateScorePop(computerScoreText.transform));
+            computerScoreText.text = computerPlayer.score.ToString();
+            previousComputerScore = computerPlayer.score;
+        }
+    }
+
+    IEnumerator AnimateScorePop(Transform textTransform)
+    {
+        Vector3 originalScale = textTransform.localScale;
+        Vector3 popUpVector = originalScale * popUpScale;
+
+        float timer = 0f;
+        while (timer < popUpDuration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / popUpDuration;
+            textTransform.localScale = Vector3.Lerp(originalScale, popUpVector, t);
+            yield return null;
+        }
+
+        timer = 0f;
+        while (timer < popUpDuration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / popUpDuration;
+            textTransform.localScale = Vector3.Lerp(popUpVector, originalScale, t);
+            yield return null;
+        }
+
+        textTransform.localScale = originalScale; // Ensure it returns to the original scale
     }
 }
