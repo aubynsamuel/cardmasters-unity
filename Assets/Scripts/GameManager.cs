@@ -57,10 +57,11 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        targetScoreText.text = targetScore.ToString();
-        targetScoreTextSettings.text = targetScore.ToString();
         accumulatedPointsText.text = accumulatedPoints.ToString();
         originalScale = ComputerControlIndicator.transform.localScale;
+        targetScore = PlayerPrefs.GetInt("targetScore", 10);
+        targetScoreText.text = targetScore.ToString();
+        targetScoreTextSettings.text = targetScore.ToString();
         UpdateScores(WhatChanged.NOTHING);
         UpdateAccumulatedPoints();
     }
@@ -441,7 +442,7 @@ public class GameManager : MonoBehaviour
         UpdateMessage(
             winningPlayer.id == humanPlayer.id
             ? $"You won this game +{finalPoints}"
-            : $"{computerPlayer.name} won this game! +{finalPoints}"
+            : $"{computerPlayer.name} won this game +{finalPoints}"
         );
 
         if (computerScore < targetScore && humanScore < targetScore)
@@ -508,12 +509,14 @@ public class GameManager : MonoBehaviour
         targetScore++;
         targetScoreText.text = targetScore.ToString();
         targetScoreTextSettings.text = targetScore.ToString();
+        PlayerPrefs.SetInt("targetScore", targetScore);
     }
     public void DecreaseTargetScore()
     {
         targetScore--;
         targetScoreText.text = targetScore.ToString();
         targetScoreTextSettings.text = targetScore.ToString();
+        PlayerPrefs.SetInt("targetScore", targetScore);
     }
     public void Exit()
     {
