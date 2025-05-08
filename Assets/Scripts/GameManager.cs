@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
 
     public float popUpScale = 2f;
     public float popUpDuration = 0.2f;
-    public GameObject startBtn;
+    // public GameObject startBtn;
 
     // Game state variables
     private readonly List<Play> currentPlays = new();
@@ -37,8 +37,9 @@ public class GameManager : MonoBehaviour
     // private readonly List<GameHistoryEntry> gameHistory = new();
     public int accumulatedPoints = 0;
     private string lastPlayedSuit = null;
-    private Player currentControl;
+    public Player currentControl;
     private bool canPlayCard = false;
+    public bool canFold = false;
     [HideInInspector] public GameObject computerCardTODestroy;
     [HideInInspector] public GameObject humanCardTODestroy;
 
@@ -111,7 +112,7 @@ public class GameManager : MonoBehaviour
         currentPlays.Clear();
         UpdateMessage(needsShuffle ? "Shuffling cards..." : "");
         gameOver = false;
-        startBtn.SetActive(currentControl.id == computerPlayer.id);
+        // startBtn.SetActive(currentControl.id == computerPlayer.id);
         // gameHistory.Clear();
         historyUI.ClearMessages();
         accumulatedPoints = 0;
@@ -129,18 +130,18 @@ public class GameManager : MonoBehaviour
         }
         canPlayCard = currentControl.id == humanPlayer.id;
         UpdateMessage(currentControl.id == computerPlayer.id
-                  ? "Press 'Start' to start"
+                  ? ""
                   : "Play a card to start");
     }
 
-    public void StartButtonClicked()
+    public void StartComputerTurn()
     {
         StartCoroutine(ComputerTurnDelay());
     }
 
     private IEnumerator ComputerTurnDelay()
     {
-        startBtn.SetActive(false);
+        // startBtn.SetActive(false);
         yield return new WaitForSeconds(1.5f);
         ComputerTurn();
     }
@@ -404,6 +405,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void Fold()
+    {
+        if (!canFold) return;
+        HandleGameOver(computerPlayer, 0, 1);
+        players.ForEach(p =>
+        {
+            p.hands.ForEach(card =>
+            {
+                cardsSetup.cardObjectMap.TryGetValue(card, out GameObject cardGO);
+                Destroy(cardGO);
+            });
+            p.hands.Clear();
+        });
+        currentPlays.ForEach(p =>
+        {
+            cardsSetup.cardObjectMap.TryGetValue(p.card, out GameObject cardGO);
+            Destroy(cardGO);
+        });
+        currentPlays.Clear();
+    }
+
     private void ResetRound()
     {
         canPlayCard = false;
@@ -415,9 +437,10 @@ public class GameManager : MonoBehaviour
 
     private void HandleGameOver(Player winningPlayer, int newAccumulatedPoints, int pointsEarned)
     {
+        canFold = false;
         canPlayCard = false;
         gameOver = true;
-        startBtn.SetActive(false);
+        // startBtn.SetActive(false);
 
 
         int finalPoints = newAccumulatedPoints == 0 ? pointsEarned : newAccumulatedPoints;
@@ -506,17 +529,23 @@ public class GameManager : MonoBehaviour
 
     public void IncreaseTargetScore()
     {
-        targetScore++;
-        targetScoreText.text = targetScore.ToString();
-        targetScoreTextSettings.text = targetScore.ToString();
-        PlayerPrefs.SetInt("targetScore", targetScore);
+        if (targetScore < 30)
+        {
+            targetScore++;
+            targetScoreText.text = targetScore.ToString();
+            targetScoreTextSettings.text = targetScore.ToString();
+            PlayerPrefs.SetInt("targetScore", targetScore);
+        }
     }
     public void DecreaseTargetScore()
     {
-        targetScore--;
-        targetScoreText.text = targetScore.ToString();
-        targetScoreTextSettings.text = targetScore.ToString();
-        PlayerPrefs.SetInt("targetScore", targetScore);
+        if (targetScore > 1)
+        {
+            targetScore--;
+            targetScoreText.text = targetScore.ToString();
+            targetScoreTextSettings.text = targetScore.ToString();
+            PlayerPrefs.SetInt("targetScore", targetScore);
+        }
     }
     public void Exit()
     {

@@ -99,6 +99,12 @@ public class CardsSetup : MonoBehaviour
         }
         yield return StartCoroutine(RepositionRemainingDeckCoroutine(remainingDeckData));
         gameClass.Initialize(players, deck);
+        gameClass.canFold = true;
+        if (gameClass.currentControl.id == gameClass.computerPlayer.id)
+        {
+            gameClass.StartComputerTurn();
+            Debug.Log("Start game called");
+        }
     }
 
     public IEnumerator StartSetup(int startIndex, string humanId)
@@ -148,6 +154,12 @@ public class CardsSetup : MonoBehaviour
 
         if (remainingDeckData.Count >= 22)
             yield return StartCoroutine(RepositionRemainingDeckCoroutine(remainingDeckData));
+        gameClass.canFold = true;
+        if (gameClass.currentControl.id == gameClass.computerPlayer.id)
+        {
+            gameClass.StartComputerTurn();
+            Debug.Log("Start game called");
+        }
     }
 
     #region Unchanged Methods
