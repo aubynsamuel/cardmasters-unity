@@ -24,6 +24,13 @@ public class GameManager : MonoBehaviour
     public TMPro.TextMeshProUGUI targetScoreText;
     public TMPro.TextMeshProUGUI targetScoreTextSettings;
     public TMPro.TextMeshProUGUI accumulatedPointsText;
+    public GameObject settingsPanel;
+    public GameObject gameOverPanel;
+    public GameObject wonImage;
+    public GameObject loseImage;
+    public TMPro.TextMeshProUGUI humanScoreTextGO;
+    public TMPro.TextMeshProUGUI computerScoreTextGO;
+    public GameObject foldPanel;
 
     public float popUpScale = 2f;
     public float popUpDuration = 0.2f;
@@ -46,6 +53,7 @@ public class GameManager : MonoBehaviour
     public CardsSetup cardsSetup;
     [SerializeField] private readonly float animationDuration = 0.25f;
     private Vector3 originalScale;
+    private float originalPopUpScale;
 
     // Card symbols for display
     private readonly Dictionary<string, string> suitSymbols = new()
@@ -60,6 +68,7 @@ public class GameManager : MonoBehaviour
     {
         accumulatedPointsText.text = accumulatedPoints.ToString();
         originalScale = ComputerControlIndicator.transform.localScale;
+        originalPopUpScale = popUpScale;
         targetScore = PlayerPrefs.GetInt("targetScore", 10);
         targetScoreText.text = targetScore.ToString();
         targetScoreTextSettings.text = targetScore.ToString();
@@ -74,14 +83,14 @@ public class GameManager : MonoBehaviour
 
         bool isHuman = currentControl.id == humanPlayer.id;
         // human indicator
-        StartCoroutine(AnimateScale(
+        StartCoroutine(AnimateControlIndicator(
             HumanControlIndicator.transform,
             HumanControlIndicator.transform.localScale,
             isHuman ? originalScale : Vector3.zero,
             animationDuration
         ));
         // computer indicator
-        StartCoroutine(AnimateScale(
+        StartCoroutine(AnimateControlIndicator(
             ComputerControlIndicator.transform,
             ComputerControlIndicator.transform.localScale,
             isHuman ? Vector3.zero : originalScale,
@@ -478,10 +487,20 @@ public class GameManager : MonoBehaviour
         {
             Player winner = humanScore >= targetScore ? humanPlayer : computerPlayer;
             if (winner.id == humanPlayer.id)
+            {
                 cardsSetup.audioSource.PlayOneShot(cardsSetup.winSound);
+                wonImage.SetActive(true);
+            }
             else
+            {
                 cardsSetup.audioSource.PlayOneShot(cardsSetup.loseSound);
+                loseImage.SetActive(true);
+            }
             UpdateMessage($"Game Over {winner.name} won");
+            humanScoreTextGO.text = humanPlayer.score.ToString();
+            computerScoreTextGO.text = computerPlayer.score.ToString();
+            StartCoroutine(AnimateScorePop(gameOverPanel.transform, true));
+            Debug.Log("Panel Should be active");
         }
     }
 
@@ -554,8 +573,15 @@ public class GameManager : MonoBehaviour
         Application.Quit();
     }
 
-    IEnumerator AnimateScorePop(Transform textTransform)
+    IEnumerator AnimateScorePop(Transform textTransform, bool gameOver = false, float delay = 1f, float scale = 1.2f)
     {
+        if (gameOver)
+        {
+            popUpScale = scale;
+            yield return new WaitForSeconds(delay);
+            textTransform.gameObject.SetActive(true);
+        }
+        else popUpScale = originalPopUpScale;
         Vector3 originalScale = textTransform.localScale;
         Vector3 popUpVector = originalScale * popUpScale;
 
@@ -579,7 +605,7 @@ public class GameManager : MonoBehaviour
 
         textTransform.localScale = originalScale; // Ensure it returns to the original scale
     }
-    private IEnumerator AnimateScale(Transform target, Vector3 from, Vector3 to, float duration)
+    private IEnumerator AnimateControlIndicator(Transform target, Vector3 from, Vector3 to, float duration)
     {
         float elapsed = 0f;
         target.localScale = from;
@@ -599,6 +625,22 @@ public class GameManager : MonoBehaviour
             target.gameObject.SetActive(false);
     }
 
+    public void ShowSettingsPanel()
+    {
+        StartCoroutine(AnimateScorePop(settingsPanel.transform, true, 0.2f, 1.1f));
+    }
+    public void HideSettingsPanel()
+    {
+        settingsPanel.SetActive(false);
+    }
+    public void ShowFoldPanel()
+    {
+        StartCoroutine(AnimateScorePop(foldPanel.transform, true, 0.2f, 1.1f));
+    }
+    public void HideFoldPanel()
+    {
+        foldPanel.SetActive(false);
+    }
 }
 
 public enum WhatChanged
