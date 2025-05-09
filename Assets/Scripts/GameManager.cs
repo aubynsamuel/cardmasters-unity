@@ -408,7 +408,9 @@ public class GameManager : MonoBehaviour
     public void Fold()
     {
         if (!canFold) return;
+        if (gameOver) return;
         HandleGameOver(computerPlayer, 0, 1);
+        currentControl = computerPlayer;
         players.ForEach(p =>
         {
             p.hands.ForEach(card =>
