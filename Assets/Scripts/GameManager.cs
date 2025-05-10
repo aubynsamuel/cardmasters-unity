@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private readonly float animationDuration = 0.25f;
     private Vector3 originalScale;
     private float originalPopUpScale;
+    // public List<Card> _allPlayedCardsInCurrentDeal = new();
 
     // Card symbols for display
     private readonly Dictionary<string, string> suitSymbols = new()
@@ -271,6 +272,7 @@ public class GameManager : MonoBehaviour
         // Update round state
         currentPlays.Add(play);
         currentLeadCard ??= card;
+        // _allPlayedCardsInCurrentDeal.Add(card);
 
         // Add to game history
         AddToGameHistory($"{player.name} played {card.rank}{suitSymbols[card.suit]}", false);
@@ -500,7 +502,6 @@ public class GameManager : MonoBehaviour
             humanScoreTextGO.text = humanPlayer.score.ToString();
             computerScoreTextGO.text = computerPlayer.score.ToString();
             StartCoroutine(AnimateScorePop(gameOverPanel.transform, true));
-            Debug.Log("Panel Should be active");
         }
     }
 

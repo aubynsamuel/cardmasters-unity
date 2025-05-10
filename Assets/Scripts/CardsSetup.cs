@@ -103,7 +103,6 @@ public class CardsSetup : MonoBehaviour
         if (gameClass.currentControl.id == gameClass.computerPlayer.id)
         {
             gameClass.StartComputerTurn();
-            Debug.Log("Start game called");
         }
     }
 
@@ -130,8 +129,11 @@ public class CardsSetup : MonoBehaviour
             yield break;
         }
 
-        if (deck == null || deck.Count < players.Count * 5)
+        bool needsShuffling = deck == null || deck.Count < players.Count * 5;
+
+        if (needsShuffling)
         {
+            // gameClass._allPlayedCardsInCurrentDeal.Clear();
             deck.Clear();
             DestroyAllCards();
             List<Card> initialDeckData = CreateDeck();
@@ -158,7 +160,6 @@ public class CardsSetup : MonoBehaviour
         if (gameClass.currentControl.id == gameClass.computerPlayer.id)
         {
             gameClass.StartComputerTurn();
-            Debug.Log("Start game called");
         }
     }
 
